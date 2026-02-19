@@ -29,3 +29,5 @@ pnpm preview
 ## Deployment
 
 This project is configured to deploy on Cloudflare Pages using Wrangler.
+
+Test new auto deployment
