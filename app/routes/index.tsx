@@ -2,6 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { CaseStudyCard } from "@/components/case-study-card";
+import {
+  PersonalProjectCard,
+  FittedInDiagram,
+  MyFlixDiagram,
+  SectionHeader,
+} from "@/components/personal-project-card";
 import { Philosophy } from "@/components/philosophy";
 import { Footer } from "@/components/footer";
 
@@ -86,6 +92,46 @@ const caseStudies = [
   },
 ];
 
+const personalProjects = [
+  {
+    title: "Fitted In",
+    badges: [
+      { text: "AI Agents Orchestrations", variant: "primary" as const },
+      { text: "LLM Streaming", variant: "muted" as const },
+    ],
+    description:
+      "A distributed AI pipeline optimized for <strong>zero-latency document synthesis</strong>. By fanning out resume processing to parallel agents, the system aggregates a tailored profile in real-time, streaming <strong>formatted Markdown</strong> directly to a copy-ready workspace for immediate use in Google Docs or Word.",
+    features: [],
+    githubUrl: "https://github.com/marthaya-putra/fitted-in",
+    diagram: <FittedInDiagram />,
+  },
+  {
+    title: "My Flix",
+    badges: [
+      { text: "Affinity Engine", variant: "primary" as const },
+      { text: "Stateful UI", variant: "muted" as const },
+    ],
+    description:
+      "A media discovery engine focused on the <strong>Reciprocal Loop</strong> of user behavior. By weighting sentiment across movie metadata, the system recursively updates a local preference state to re-rank search results and prune discovery feeds, ensuring the interface evolves with the user.",
+    features: [
+      {
+        title: "Sentiment Graphing",
+        description:
+          "Links user 'Likes/Dislikes' to specific TMDB entities (Actors, Genres, Directors).",
+        color: "primary" as const,
+      },
+      {
+        title: "Discovery Pruning",
+        description:
+          "Implicitly removes content from discovery lists based on cumulative negative affinity scores.",
+        color: "destructive" as const,
+      },
+    ],
+    githubUrl: "https://github.com/marthaya-putra/my-flix",
+    diagram: <MyFlixDiagram />,
+  },
+];
+
 function HomePage() {
   return (
     <div className="bg-background text-foreground leading-relaxed min-h-screen">
@@ -95,12 +141,16 @@ function HomePage() {
 
       <main className="max-w-4xl mx-auto px-6 pb-24">
         <section id="case-studies" className="space-y-16">
-          <h2 className="text-3xl font-bold text-foreground">
-            Selected Impacts
-          </h2>
-
+          <SectionHeader>Selected Impacts</SectionHeader>
           {caseStudies.map((study) => (
             <CaseStudyCard key={study.title} {...study} />
+          ))}
+        </section>
+
+        <section id="personal-projects" className="mt-24 space-y-16">
+          <SectionHeader>Personal Projects</SectionHeader>
+          {personalProjects.map((project) => (
+            <PersonalProjectCard key={project.title} {...project} />
           ))}
         </section>
 
