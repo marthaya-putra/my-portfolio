@@ -21,10 +21,9 @@ const caseStudies = [
       "Architected the frontend using <strong>Next.js, tRPC, and Supabase</strong>. Collaborated in a 'feature trio' to drive rapid discovery and deployment of core telehealth features.",
     tradeOffs: [
       {
-        decision: "tRPC Integration",
-        productBenefit:
-          "End-to-end type safety for rapid, bug-free feature pivots",
-        techTradeOff: "Tight coupling between frontend and backend layers",
+        decision: "Direct Database-to-Frontend Pipeline",
+        productBenefit: "Eliminate API layer maintenance for faster shipping",
+        techTradeOff: "Coupled deployment cycle",
       },
       {
         decision: "Continuous UI/UX Iteration",
