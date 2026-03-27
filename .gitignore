@@ -12,6 +12,8 @@ node_modules/
 # Build outputs
 dist/
 .output/
+.tanstack
+.niro
 
 # Wrangler
 .wrangler/

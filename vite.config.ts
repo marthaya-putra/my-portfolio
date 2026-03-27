@@ -1,16 +1,16 @@
-import { defineConfig } from "vite"
-import { tanstackStart } from "@tanstack/react-start/plugin/vite"
-import { cloudflare } from "@cloudflare/vite-plugin"
-import viteReact from "@vitejs/plugin-react"
-import path from "path"
-
-const isDev = process.env.NODE_ENV !== "production"
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import path from "path";
 
 export default defineConfig({
   plugins: [
-    // Skip Cloudflare plugin in dev for HMR support
-    ...(isDev ? [] : [cloudflare({ viteEnvironment: { name: "ssr" } })]),
-    tanstackStart({ srcDirectory: "app" }),
+    cloudflare(),
+    tanstackStart({
+      tsr: { srcDirectory: "app" },
+      customViteReactPlugin: true,
+    }),
     viteReact(),
   ],
   resolve: {
@@ -18,4 +18,4 @@ export default defineConfig({
       "@": path.resolve(__dirname, "."),
     },
   },
-})
+});
