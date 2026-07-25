@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ParticleScroll } from "@/components/particle-scroll";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { CaseStudyCard } from "@/components/case-study-card";
@@ -134,30 +135,32 @@ const personalProjects = [
 
 function HomePage() {
   return (
-    <div className="bg-background text-foreground leading-relaxed min-h-screen">
+    <div className="bg-background text-foreground leading-relaxed min-h-[100dvh] flex flex-col">
       <Navbar />
 
-      <Hero />
+      <ParticleScroll className="flex-1 min-h-0">
+        <Hero />
 
-      <main className="max-w-4xl mx-auto px-6 pb-24">
-        <section id="case-studies" className="space-y-16">
-          <SectionHeader>Selected Impacts</SectionHeader>
-          {caseStudies.map((study) => (
-            <CaseStudyCard key={study.title} {...study} />
-          ))}
-        </section>
+        <main className="max-w-4xl mx-auto px-6 pb-24">
+          <section id="case-studies" className="space-y-16">
+            <SectionHeader>Selected Impacts</SectionHeader>
+            {caseStudies.map((study) => (
+              <CaseStudyCard key={study.title} {...study} />
+            ))}
+          </section>
 
-        <section id="personal-projects" className="mt-24 space-y-16">
-          <SectionHeader>Personal Projects</SectionHeader>
-          {personalProjects.map((project) => (
-            <PersonalProjectCard key={project.title} {...project} />
-          ))}
-        </section>
+          <section id="personal-projects" className="mt-24 space-y-16">
+            <SectionHeader>Personal Projects</SectionHeader>
+            {personalProjects.map((project) => (
+              <PersonalProjectCard key={project.title} {...project} />
+            ))}
+          </section>
 
-        <Philosophy />
-      </main>
+          <Philosophy />
+        </main>
 
-      <Footer />
+        <Footer />
+      </ParticleScroll>
     </div>
   );
 }

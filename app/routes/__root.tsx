@@ -13,6 +13,12 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
+        // Chrome Origin Trial token — enables HTMLInCanvas on marthayaputra.xyz (+ subdomains). Expires ~2026-11-18.
+        "http-equiv": "origin-trial",
+        content:
+          "Ao1vsyx6bXGH7HknX8YSIZ+xCnqAKIxHMZ9FBx1SirymRw5uU6C5XPdM5jz31A0QxCDOSFI607tD3WJU7h5PfwUAAABqeyJvcmlnaW4iOiJodHRwczovL21hcnRoYXlhcHV0cmEueHl6OjQ0MyIsImZlYXR1cmUiOiJIVE1MSW5DYW52YXMiLCJleHBpcnkiOjE3OTI0NTQ0MDAsImlzU3ViZG9tYWluIjp0cnVlfQ==",
+      },
+      {
         title: "Software Engineer & Product Strategist | Portfolio",
       },
       {
