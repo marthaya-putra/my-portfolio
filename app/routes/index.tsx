@@ -135,7 +135,7 @@ const personalProjects = [
 
 function HomePage() {
   return (
-    <div className="bg-background text-foreground leading-relaxed min-h-[100dvh] flex flex-col">
+    <div className="bg-background text-foreground leading-relaxed h-[100dvh] flex flex-col overflow-hidden">
       <Navbar />
 
       <ParticleScroll className="flex-1 min-h-0">

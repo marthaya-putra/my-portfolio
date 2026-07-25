@@ -244,6 +244,7 @@ export function supportsHtmlInCanvas(): boolean {
 export function createParticleScroll(
   elements: ParticleScrollElements,
   options: ParticleScrollOptions = {},
+  callbacks?: { onCaptureFailed?: () => void },
 ): ParticleScrollInstance | null {
   const config = { ...DEFAULTS, ...options };
   const { source, content, output } = elements;
@@ -266,6 +267,9 @@ export function createParticleScroll(
   );
 
   let contentDirty = false;
+  let captureFailed = false;
+  let paintCount = 0;
+  let lastPaintTime = 0;
   let wake = () => {};
 
   if (htmlInCanvas) {
@@ -274,10 +278,27 @@ export function createParticleScroll(
         sourceCtx!.reset();
         sourceCtx!.drawElementImage!(content, 0, 0);
         contentDirty = true;
+        paintCount++;
+        lastPaintTime = performance.now();
         wake();
-      } catch {}
+      } catch {
+        markCaptureFailed();
+      }
     };
   }
+
+  function markCaptureFailed() {
+    if (captureFailed) return;
+    captureFailed = true;
+    callbacks?.onCaptureFailed?.();
+  }
+
+  // Safety net: if onpaint never fires (or fires then stops without a usable
+  // capture), flip to fallback so the DOM content remains visible instead of
+  // being hidden behind an opaque, empty WebGL surface.
+  setTimeout(() => {
+    if (!captureFailed && paintCount === 0) markCaptureFailed();
+  }, 2500);
 
   function compile(type: number, text: string): WebGLShader {
     const shader = gl!.createShader(type)!;
@@ -411,6 +432,23 @@ export function createParticleScroll(
   const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   let reducedMotion = motionQuery.matches;
 
+  // Repaint when images load — drawElementImage captures the current DOM
+  // state, so a poster that finishes loading after the initial paint would
+  // otherwise never appear in the texture.
+  function onImageLoad() {
+    if (htmlInCanvas) paintable.requestPaint!();
+  }
+  const images = content.querySelectorAll("img");
+  images.forEach((img) => {
+    img.addEventListener("load", onImageLoad);
+    img.addEventListener("error", onImageLoad);
+    if (img.complete) onImageLoad();
+  });
+  const mutationObserver = new MutationObserver(() => {
+    if (htmlInCanvas) paintable.requestPaint!();
+  });
+  mutationObserver.observe(content, { childList: true, subtree: true });
+
   let time = 0;
   let introDone = false;
   let introWait = 0;
@@ -425,15 +463,21 @@ export function createParticleScroll(
     introReady = true;
     syncBgColor();
     gl!.bindTexture(gl!.TEXTURE_2D, contentTexture);
-    gl!.texImage2D(
-      gl!.TEXTURE_2D,
-      0,
-      gl!.RGBA,
-      gl!.RGBA,
-      gl!.UNSIGNED_BYTE,
-      source,
-    );
-    gl!.generateMipmap(gl!.TEXTURE_2D);
+    try {
+      gl!.texImage2D(
+        gl!.TEXTURE_2D,
+        0,
+        gl!.RGBA,
+        gl!.RGBA,
+        gl!.UNSIGNED_BYTE,
+        source,
+      );
+      gl!.generateMipmap(gl!.TEXTURE_2D);
+    } catch {
+      // Most likely: source canvas is tainted by cross-origin images
+      // without CORS → texImage2D throws SecurityError. Drop to fallback.
+      markCaptureFailed();
+    }
   }
 
   function rowTargetFor(docRowY: number) {
@@ -542,7 +586,7 @@ export function createParticleScroll(
     gl!.uniform1f(base.uniforms.uRowCount, winLen);
     gl!.uniform1f(base.uniforms.uStagger, stagger);
     gl!.uniform1f(base.uniforms.uMaxX, contentMaxX);
-    gl!.uniform1f(base.uniforms.uCover, htmlInCanvas ? 1 : 0);
+    gl!.uniform1f(base.uniforms.uCover, htmlInCanvas && !captureFailed ? 1 : 0);
     gl!.uniform1f(base.uniforms.uScroll, scrollTop);
     gl!.uniform1f(base.uniforms.uWinStart, winStart);
     gl!.uniform3f(base.uniforms.uBg, bg[0], bg[1], bg[2]);
@@ -671,6 +715,58 @@ export function createParticleScroll(
   });
   intersection.observe(output);
 
+  // ─── Custom fade-in scrollbar thumb ───
+  // Native scrollbar is hidden via .hide-scrollbar on the inner div. This
+  // floating thumb gives the user a subtle scroll indicator: appears on
+  // scroll, fades out after 1s idle. Matches canvasui.dev's aesthetic.
+  // Only runs in native mode (htmlInCanvas) — fallback uses the normal
+  // page scrollbar.
+  let thumb: HTMLDivElement | null = null;
+  let thumbHideTimer: ReturnType<typeof setTimeout> | null = null;
+  const thumbLayout = () => {
+    if (!thumb) return false;
+    const max = content.scrollHeight - content.clientHeight;
+    if (max <= 1) {
+      thumb.style.opacity = "0";
+      return false;
+    }
+    const trackTop = 8;
+    const trackHeight = window.innerHeight - 16;
+    const height = Math.max(
+      36,
+      (content.clientHeight / content.scrollHeight) * trackHeight,
+    );
+    const top = trackTop + (content.scrollTop / max) * (trackHeight - height);
+    thumb.style.height = `${height}px`;
+    thumb.style.transform = `translateY(${top}px)`;
+    return true;
+  };
+  const thumbShow = () => {
+    if (!thumbLayout()) return;
+    if (!thumb) return;
+  };
+  if (htmlInCanvas) {
+    thumb = document.createElement("div");
+    thumb.setAttribute("aria-hidden", "true");
+    Object.assign(thumb.style, {
+      position: "fixed",
+      right: "8px",
+      top: "0",
+      width: "4px",
+      background: "hsl(var(--foreground) / 0.3)",
+      borderRadius: "2px",
+      pointerEvents: "none",
+      zIndex: "50",
+    } as Partial<CSSStyleDeclaration>);
+    document.body.appendChild(thumb);
+    content.addEventListener("scroll", thumbShow, { passive: true });
+    window.addEventListener("resize", thumbShow);
+    const thumbObserver = new ResizeObserver(thumbLayout);
+    thumbObserver.observe(content);
+    // Initial layout pass.
+    thumbLayout();
+  }
+
   return {
     setOptions(next) {
       Object.assign(config, next);
@@ -687,6 +783,17 @@ export function createParticleScroll(
       observer.disconnect();
       intersection.disconnect();
       motionQuery.removeEventListener("change", onMotionChange);
+      content
+        .querySelectorAll("img")
+        .forEach((img) => img.removeEventListener("load", onImageLoad));
+      mutationObserver.disconnect();
+      if (thumb) {
+        content.removeEventListener("scroll", thumbShow);
+        window.removeEventListener("resize", thumbShow);
+        if (thumbHideTimer) clearTimeout(thumbHideTimer);
+        thumb.remove();
+        thumb = null;
+      }
       gl!.deleteTexture(contentTexture);
       gl!.deleteTexture(rowTex);
       gl!.deleteProgram(base.program);
@@ -731,16 +838,37 @@ export function ParticleScroll({
   );
   const native = supported && !failed;
 
+  // Lock body scroll in native mode: ParticleScroll owns an inner overflow:auto
+  // scroller, and the root layout also has a <footer> below <main>. Without
+  // this, both the inner div and body would scroll (two scrollbars). Lock
+  // body so only the inner div scrolls.
+  useEffect(() => {
+    if (!native) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [native]);
+
   useEffect(() => {
     const source = sourceRef.current;
     const content = contentRef.current;
     const output = outputRef.current;
     if (!source || !content || !output) return;
+    // Fallback mode: skip the WebGL instance entirely. The output canvas
+    // stays at its initial transparent clear, letting the DOM fallback
+    // (rendered when `native` is false) show through.
+    if (!native) return;
     instanceRef.current = createParticleScroll(
       { source, content, output },
       initialOptions,
+      // If HTML-in-canvas capture never produces a usable frame (e.g.
+      // cross-origin images taint it, or onpaint never fires), drop to the
+      // plain DOM scroll path so content stays visible.
+      { onCaptureFailed: () => setFailed(true) },
     );
-    if (native && !instanceRef.current) setFailed(true);
+    if (!instanceRef.current) setFailed(true);
     return () => {
       instanceRef.current?.destroy();
       instanceRef.current = null;
@@ -751,6 +879,12 @@ export function ParticleScroll({
     instanceRef.current?.setOptions(options);
   });
 
+  // Unsupported browser (or SSR snapshot): render children bare — no wrapper,
+  // no canvases, no bounded-height scroll container. The page behaves exactly
+  // as if <ParticleScroll> weren't mounted. SSR also lands here (server
+  // snapshot is false), so hydration matches without a flash.
+  if (!native) return <>{children}</>;
+
   return (
     <div className={className} style={{ position: "relative", ...style }}>
       <canvas
@@ -758,29 +892,16 @@ export function ParticleScroll({
         // @ts-expect-error experimental html-in-canvas attribute
         layoutsubtree="true"
         suppressHydrationWarning
-        style={
-          native
-            ? { position: "absolute", inset: 0, width: "100%", height: "100%" }
-            : { display: "none" }
-        }
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+        }}
       >
-        {native ? (
-          <div
-            ref={contentRef}
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "100%",
-              overflow: "auto",
-            }}
-          >
-            {children}
-          </div>
-        ) : null}
-      </canvas>
-      {!native ? (
         <div
           ref={contentRef}
+          className="hide-scrollbar"
           style={{
             position: "relative",
             width: "100%",
@@ -790,7 +911,7 @@ export function ParticleScroll({
         >
           {children}
         </div>
-      ) : null}
+      </canvas>
       <canvas
         ref={outputRef}
         aria-hidden
@@ -805,6 +926,5 @@ export function ParticleScroll({
     </div>
   );
 }
-
 
 export default ParticleScroll;
