@@ -6,10 +6,9 @@ import path from "path";
 
 export default defineConfig({
   plugins: [
-    cloudflare(),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart({
-      tsr: { srcDirectory: "app" },
-      customViteReactPlugin: true,
+      srcDirectory: "app",
     }),
     viteReact(),
   ],

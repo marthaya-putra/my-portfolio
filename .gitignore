@@ -17,3 +17,6 @@ dist/
 
 # Wrangler
 .wrangler/
+
+# ZCode agent state
+.zcode/
