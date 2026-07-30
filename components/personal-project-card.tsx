@@ -309,9 +309,9 @@ export function PersonalProjectCard({
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="pressable font-mono text-xs font-bold text-primary flex items-center gap-2 hover:underline"
+            className="group pressable font-mono text-xs font-bold text-primary flex items-center gap-2 hover:underline"
           >
-            VIEW_CODEBASE <ExternalLink className="w-3 h-3" strokeWidth={3} />
+            VIEW_CODEBASE <ExternalLink className="w-3 h-3 transition-transform duration-200 ease-[var(--ease-out)] group-hover:translate-x-0.5 group-hover:-translate-y-0.5" strokeWidth={3} />
           </a>
         </div>
       </div>

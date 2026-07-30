@@ -33,7 +33,7 @@ export function CaseStudyCard({
       : "bg-primary/10 text-primary"
 
   return (
-    <article className="bg-card border border-border rounded-2xl p-8 transition-all shadow-sm hover:border-primary">
+    <article className="bg-card border border-border rounded-2xl p-8 transition-[border-color,box-shadow] duration-200 ease-[var(--ease-out)] shadow-sm hover:border-primary hover:shadow-md">
       <div className="flex flex-wrap justify-between items-start mb-6">
         <div>
           <h3 className="text-2xl font-bold mb-2 text-card-foreground">
