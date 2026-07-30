@@ -16,13 +16,21 @@ export function Philosophy() {
   return (
     <section
       id="philosophy"
-      className="mt-24 bg-foreground text-background rounded-3xl p-10"
+      className="tick mt-24 bg-foreground text-background rounded-sm p-8 md:p-10"
     >
-      <h2 className="text-3xl font-bold mb-6 italic text-primary">
-        {'"Build for the users, not the resume."'}
-      </h2>
-      <div className="grid md:grid-cols-2 gap-10">
-        <p className="text-background/70">
+      <div className="mono-label text-primary mb-4">
+        § Principles · Engineering Spec
+      </div>
+
+      {/* Callout quote */}
+      <blockquote className="border-l-2 border-primary pl-5 mb-8">
+        <p className="text-2xl md:text-3xl font-bold italic text-primary leading-snug">
+          {"“Build for the users, not the resume.”"}
+        </p>
+      </blockquote>
+
+      <div className="grid md:grid-cols-2 gap-8">
+        <p className="text-background/70 leading-relaxed border-t border-background/20 pt-4">
           {
             "I believe that technical debt is often a business decision, not just a coding one. My approach focuses on "
           }
@@ -31,12 +39,19 @@ export function Philosophy() {
             ", building what we need today while architecting for tomorrow's scale."
           }
         </p>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {principles.map((principle) => (
-            <div key={principle.number} className="flex gap-4">
-              <span className="text-primary font-mono">{principle.number}</span>
+            <div
+              key={principle.number}
+              className="flex gap-4 border border-background/20 rounded-sm p-3"
+            >
+              <span className="mono-label text-primary shrink-0">
+                § {principle.number}
+              </span>
               <p className="text-background/90">
-                <strong className="text-background">{principle.title}</strong>{" "}
+                <strong className="text-background">
+                  {principle.title}
+                </strong>{" "}
                 {principle.description}
               </p>
             </div>

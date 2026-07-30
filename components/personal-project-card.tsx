@@ -2,12 +2,16 @@ import { ExternalLink } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface SectionHeaderProps {
+  index: number;
   children: ReactNode;
 }
 
-export function SectionHeader({ children }: SectionHeaderProps) {
+export function SectionHeader({ index, children }: SectionHeaderProps) {
   return (
-    <div className="border-b-4 border-foreground pb-4">
+    <div className="flex items-baseline gap-4 border-b-2 border-foreground pb-3">
+      <span className="mono-label text-primary">
+        § {String(index).padStart(2, "0")}
+      </span>
       <h2 className="text-3xl font-black tracking-tighter uppercase">
         {children}
       </h2>
@@ -35,128 +39,137 @@ interface PersonalProjectProps {
   diagram: React.ReactNode;
 }
 
-const colorClasses = {
-  primary: { bg: "bg-primary/10", text: "text-primary", bar: "bg-primary" },
-  accent: { bg: "bg-accent/10", text: "text-accent", bar: "bg-accent" },
-  destructive: {
-    bg: "bg-destructive/10",
-    text: "text-destructive",
-    bar: "bg-destructive",
-  },
-};
-
 const badgeClasses = {
-  primary: "bg-primary/10 text-primary",
+  primary: "bg-primary/10 text-primary border-primary/30",
   muted: "bg-muted text-muted-foreground border border-border",
 };
 
+const barClasses = {
+  primary: "bg-primary",
+  accent: "bg-accent",
+  destructive: "bg-destructive",
+};
+
+/* Shared schematic node + bus primitives.
+   Rasterization-safe: borders, solid fills, box-shadow only. */
+
+function Node({
+  label,
+  sub,
+  tone = "default",
+}: {
+  label: string;
+  sub?: string;
+  tone?: "default" | "primary" | "accent";
+}) {
+  const toneClass =
+    tone === "primary"
+      ? "bg-primary/5 border-primary/30"
+      : tone === "accent"
+        ? "bg-accent/5 border-accent/30"
+        : "bg-card border-border";
+  const subTone =
+    tone === "primary"
+      ? "text-primary"
+      : tone === "accent"
+        ? "text-accent"
+        : "text-muted-foreground";
+  return (
+    <div
+      className={`relative border rounded-sm px-3 py-2 text-center shadow-sm ${toneClass}`}
+    >
+      <div className="mono-label text-[10px] mb-0.5">{label}</div>
+      {sub && (
+        <div className={`font-mono text-[9px] uppercase leading-tight ${subTone}`}>
+          {sub}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Bus({ label }: { label: string }) {
+  return (
+    <div className="w-full flex justify-center py-1.5 relative">
+      <div className="mono-label px-3 py-1 bg-foreground text-background rounded-sm z-10 text-[10px]">
+        {label}
+      </div>
+      <div className="absolute w-full h-px bg-border top-1/2" />
+    </div>
+  );
+}
+
+function FlowConnector({ vertical = true }: { vertical?: boolean }) {
+  return vertical ? (
+    <div className="w-px h-5 bg-border mx-auto" />
+  ) : (
+    <div className="h-px w-full bg-border" />
+  );
+}
+
 export function FittedInDiagram() {
   return (
-    <div className="bg-card border-2 border-border rounded-3xl overflow-hidden shadow-lg">
-      <div className="bg-foreground p-4 flex justify-between items-center">
-        <span className="font-mono text-[10px] text-primary uppercase">
-          Parallel_Agent_Synthesis_Map
+    <div className="tick bg-card border-2 border-border rounded-sm overflow-hidden shadow-lg">
+      {/* Window chrome */}
+      <div className="bg-foreground px-4 py-2.5 flex justify-between items-center">
+        <span className="mono-label text-primary text-[10px]">
+          ▣ Schematic · Fitted_In/Pipeline
         </span>
         <div className="flex gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-muted-foreground" />
-          <div className="w-2 h-2 rounded-full bg-muted-foreground" />
+          <div className="w-2 h-2 rounded-full bg-accent/60" />
+          <div className="w-2 h-2 rounded-full bg-muted-foreground/60" />
         </div>
       </div>
-      <div className="p-6 md:p-8 bg-background relative">
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, currentColor 2px, transparent 2px)",
-            backgroundSize: "30px 30px",
-          }}
-        />
 
-        <div className="flex flex-col items-center space-y-4 md:space-y-6 relative">
-          <div className="flex flex-col md:flex-row gap-3 md:gap-4 w-full justify-center">
-            <div className="p-2 md:p-3 bg-card border border-border rounded-lg shadow-sm text-center flex-1 max-w-[140px]">
-              <div className="text-[8px] md:text-[10px] font-bold text-muted-foreground uppercase">
-                Context A
-              </div>
-              <div className="text-[10px] md:text-xs font-bold">
-                Master Resume
-              </div>
-            </div>
-            <div className="p-2 md:p-3 bg-primary/5 border border-primary/20 rounded-lg shadow-sm text-center flex-1 max-w-[140px]">
-              <div className="text-[8px] md:text-[10px] font-bold text-primary uppercase">
-                Context B
-              </div>
-              <div className="text-[10px] md:text-xs font-bold">
-                LinkedIn Scrape
-              </div>
+      <div className="p-5 md:p-7 bg-background blueprint-grid relative space-y-3">
+        <div className="mono-label text-muted-foreground text-[10px]">
+          Fig. 01 — Parallel Agent Synthesis
+        </div>
+
+        {/* Inputs */}
+        <div className="grid grid-cols-2 gap-3">
+          <Node label="Master Resume" tone="default" />
+          <Node label="LinkedIn Scrape" tone="primary" />
+        </div>
+
+        <FlowConnector />
+
+        {/* Fan-out bus */}
+        <Bus label="▶ Fan-Out Orchestration" />
+
+        {/* Parallel agents */}
+        <div className="grid grid-cols-3 gap-2">
+          <Node label="Profile Agent" sub="MD_HOOK_GEN" tone="primary" />
+          <Node label="Exp Agent" sub="BULLET_ALIGN" tone="primary" />
+          <Node label="Skills Agent" sub="ATS_FILTER_GEN" tone="accent" />
+        </div>
+
+        <FlowConnector />
+
+        {/* Fan-in bus */}
+        <Bus label="◀ Fan-In Streaming" />
+
+        {/* Output */}
+        <div className="space-y-2">
+          <div className="h-9 rounded-sm border border-border bg-muted/40 flex items-center px-3 justify-between">
+            <span className="font-mono text-[10px] text-primary font-bold">
+              STREAMING_MARKDOWN_CHUNKS…
+            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-accent rounded-full" />
             </div>
           </div>
-
-          <div className="w-full flex justify-center py-2 relative">
-            <div className="px-3 py-1 bg-foreground text-background text-[9px] md:text-[10px] font-black italic rounded z-10">
-              FAN-OUT AGENT ORCHESTRATION
-            </div>
-            <div className="absolute w-full h-px bg-border top-1/2" />
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 md:gap-3 w-full">
-            <div className="p-2 md:p-3 bg-card border border-border rounded-xl text-center shadow-sm">
-              <div className="text-[8px] md:text-[10px] font-bold text-primary uppercase">
-                Profile Agent
-              </div>
-              <div className="text-[7px] md:text-[8px] text-muted-foreground mt-1 uppercase leading-tight font-mono">
-                MD_HOOK_GEN
-              </div>
-            </div>
-            <div className="p-2 md:p-3 bg-card border border-border rounded-xl text-center shadow-sm">
-              <div className="text-[8px] md:text-[10px] font-bold text-primary uppercase">
-                Exp Agent
-              </div>
-              <div className="text-[7px] md:text-[8px] text-muted-foreground mt-1 uppercase leading-tight font-mono">
-                BULLET_ALIGN
-              </div>
-            </div>
-            <div className="p-2 md:p-3 bg-card border border-border rounded-xl text-center shadow-sm">
-              <div className="text-[8px] md:text-[10px] font-bold text-accent uppercase">
-                Skills Agent
-              </div>
-              <div className="text-[7px] md:text-[8px] text-muted-foreground mt-1 uppercase leading-tight font-mono">
-                ATS_FILTER_GEN
-              </div>
-            </div>
-          </div>
-
-          <div className="w-full flex justify-center py-2 relative">
-            <div className="px-3 py-1 bg-foreground text-background text-[9px] md:text-[10px] font-black italic rounded z-10">
-              FAN-IN STREAMING
-            </div>
-            <div className="absolute w-full h-px bg-border top-1/2" />
-          </div>
-
-          <div className="w-full space-y-2 md:space-y-3">
-            <div className="h-8 md:h-10 rounded-lg flex items-center px-3 md:px-4 justify-between border border-border bg-gradient-to-r from-foreground via-muted-foreground to-foreground bg-[length:200%_100%] animate-shimmer shadow-inner">
-              <span className="font-mono text-[9px] md:text-[10px] text-primary font-bold">
-                STREAMING_MARKDOWN_CHUNKS...
+          <div className="bg-card border border-border rounded-sm px-3 py-2 flex justify-between items-center shadow-sm">
+            <div className="flex flex-col">
+              <span className="mono-label text-muted-foreground text-[10px]">
+                Final Output
               </span>
-              <div className="flex gap-1">
-                <div className="w-1.5 h-1.5 bg-accent rounded-full animate-ping" />
-              </div>
+              <span className="font-mono text-xs font-bold text-foreground">
+                Formatted Workspace
+              </span>
             </div>
-            <div className="bg-card border border-border p-3 md:p-4 rounded-xl flex justify-between items-center shadow-sm">
-              <div className="flex flex-col">
-                <span className="text-[9px] md:text-[10px] font-bold text-muted-foreground uppercase">
-                  Final Output
-                </span>
-                <span className="text-[10px] md:text-xs font-bold text-foreground">
-                  Formatted Workspace View
-                </span>
-              </div>
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className="px-2 md:px-3 py-1 bg-primary/10 text-primary text-[9px] md:text-[10px] font-black rounded border border-primary/20 uppercase">
-                  Copy to G-Docs
-                </div>
-                <ExternalLink className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
-              </div>
+            <div className="mono-label px-2 py-0.5 bg-primary/10 text-primary text-[10px] rounded-sm border border-primary/20">
+              Copy → Docs
             </div>
           </div>
         </div>
@@ -167,87 +180,69 @@ export function FittedInDiagram() {
 
 export function MyFlixDiagram() {
   return (
-    <div className="bg-card border-2 border-border rounded-3xl overflow-hidden shadow-lg">
-      <div className="bg-foreground p-4 flex justify-between items-center">
-        <span className="font-mono text-[10px] text-primary uppercase">
-          Affinity_Feedback_Loop_Logic
+    <div className="tick bg-card border-2 border-border rounded-sm overflow-hidden shadow-lg">
+      {/* Window chrome */}
+      <div className="bg-foreground px-4 py-2.5 flex justify-between items-center">
+        <span className="mono-label text-primary text-[10px]">
+          ▣ Schematic · My_Flix/Affinity_Loop
         </span>
         <div className="flex gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-muted" />
-          <div className="w-2 h-2 rounded-full bg-muted" />
+          <div className="w-2 h-2 rounded-full bg-accent/60" />
+          <div className="w-2 h-2 rounded-full bg-muted-foreground/60" />
         </div>
       </div>
-      <div className="p-6 md:p-8 bg-background relative">
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, currentColor 2px, transparent 2px)",
-            backgroundSize: "30px 30px",
-          }}
-        />
 
-        <div className="flex flex-col items-center space-y-4 md:space-y-6 relative">
-          <div className="flex gap-4 md:gap-6">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 bg-accent/20 border-2 border-accent rounded-full flex items-center justify-center text-accent shadow-sm">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 10.333z" />
-                </svg>
+      <div className="p-5 md:p-7 bg-background blueprint-grid relative space-y-3">
+        <div className="mono-label text-muted-foreground text-[10px]">
+          Fig. 02 — Reciprocal Affinity Feedback Loop
+        </div>
+
+        {/* Inputs: like / dislike */}
+        <div className="grid grid-cols-2 gap-3">
+          <Node label="▲ Like" sub="POSITIVE_SENTIMENT" tone="accent" />
+          <Node label="▼ Dislike" sub="NEGATIVE_SENTIMENT" tone="default" />
+        </div>
+
+        <FlowConnector />
+
+        {/* Reconciler */}
+        <div className="relative bg-card border border-border rounded-sm p-4 shadow-sm">
+          <div className="absolute -top-2.5 left-3 mono-label px-2 py-0.5 bg-foreground text-background text-[9px] rounded-sm">
+            LOCAL_STATE_RECONCILER
+          </div>
+          <div className="grid grid-cols-2 gap-4 pt-1">
+            <div className="space-y-1">
+              <div className="mono-label text-[10px] text-primary border-b border-border pb-1">
+                Scoring Engine
               </div>
-              <span className="text-[7px] font-black uppercase mt-1">Like</span>
+              <p className="font-mono text-[10px] leading-snug text-muted-foreground">
+                Weights IDs by sentiment frequency.
+              </p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 bg-destructive/10 border-2 border-destructive rounded-full flex items-center justify-center text-destructive shadow-sm">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.106-1.79l-.05-.025A4 4 0 0011.057 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-2.266z" />
-                </svg>
+            <div className="space-y-1 border-l pl-4 border-border">
+              <div className="mono-label text-[10px] text-primary border-b border-border pb-1">
+                Filter Pruning
               </div>
-              <span className="text-[7px] font-black uppercase mt-1">
-                Dislike
-              </span>
+              <p className="font-mono text-[10px] leading-snug text-muted-foreground">
+                Excludes content matching negative IDs.
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="h-6 w-px bg-border border-l-2 border-dashed" />
+        {/* Loop-back indicator: the reciprocal loop */}
+        <div className="flex items-center gap-2 justify-center">
+          <span className="font-mono text-primary text-sm">⟲</span>
+          <span className="mono-label text-muted-foreground text-[10px]">
+            re-ranks & feeds back into discovery
+          </span>
+        </div>
 
-          <div className="w-full bg-card border border-border rounded-2xl p-4 md:p-6 shadow-sm relative">
-            <div className="absolute -top-3 left-4 md:left-6 bg-primary text-background px-2 py-0.5 text-[8px] font-black italic">
-              LOCAL_STATE_RECONCILER
-            </div>
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="space-y-1 md:space-y-2">
-                <div className="text-[9px] md:text-[10px] font-black text-primary uppercase border-b border-border pb-1">
-                  Scoring Engine
-                </div>
-                <p className="text-[8px] md:text-[9px] text-muted-foreground font-mono leading-tight italic">
-                  Weights IDs based on sentiment frequency.
-                </p>
-              </div>
-              <div className="space-y-1 md:space-y-2 border-l pl-3 md:pl-4 border-border">
-                <div className="text-[9px] md:text-[10px] font-black text-primary uppercase border-b border-border pb-1">
-                  Filter Pruning
-                </div>
-                <p className="text-[8px] md:text-[9px] text-muted-foreground font-mono leading-tight italic">
-                  Excludes content matching negative IDs.
-                </p>
-              </div>
-            </div>
-          </div>
+        <FlowConnector />
 
-          <div className="h-6 w-px bg-border border-l-2 border-dashed" />
-
-          <div className="bg-foreground text-background px-6 md:px-8 py-2 rounded-full font-mono text-[9px] md:text-[10px] font-bold tracking-widest shadow-lg uppercase border border-border">
-            Discovery Feed Re-Ranked
-          </div>
+        {/* Output */}
+        <div className="bg-foreground text-background mono-label rounded-sm px-4 py-2 text-center text-[10px] shadow-lg">
+          Discovery Feed · Re-Ranked
         </div>
       </div>
     </div>
@@ -273,7 +268,7 @@ export function PersonalProjectCard({
             {badges.map((badge) => (
               <span
                 key={badge.text}
-                className={`px-2 py-0.5 text-[10px] md:text-xs font-bold rounded uppercase ${badgeClasses[badge.variant]}`}
+                className={`mono-label px-2 py-1 rounded-sm border ${badgeClasses[badge.variant]}`}
               >
                 {badge.text}
               </span>
@@ -282,36 +277,42 @@ export function PersonalProjectCard({
         </div>
 
         <p
-          className="text-muted-foreground leading-relaxed text-sm"
+          className="text-muted-foreground leading-relaxed text-sm [&_strong]:text-foreground [&_strong]:font-semibold"
           dangerouslySetInnerHTML={{ __html: description }}
         />
 
-        <div className="space-y-3 md:space-y-4">
-          {features.map((feature) => (
-            <div key={feature.title} className="flex items-start gap-3">
-              <div
-                className={`w-1 h-8 md:h-10 ${colorClasses[feature.color].bar} mt-0.5 md:mt-1`}
-              />
-              <div>
-                <span className="text-xs font-bold uppercase text-foreground">
-                  {feature.title}
-                </span>
-                <p className="text-xs text-muted-foreground">
-                  {feature.description}
-                </p>
+        {features.length > 0 && (
+          <div className="space-y-3 md:space-y-4">
+            {features.map((feature) => (
+              <div key={feature.title} className="flex items-start gap-3">
+                <div
+                  className={`w-1 h-8 md:h-10 ${barClasses[feature.color]} mt-0.5 md:mt-1`}
+                />
+                <div>
+                  <span className="mono-label text-xs text-foreground">
+                    {feature.title}
+                  </span>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="pt-2">
           <a
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs font-bold text-primary flex items-center gap-2 hover:underline"
+            className="group pressable mono-label text-primary flex items-center gap-2 hover:underline"
           >
-            VIEW_CODEBASE <ExternalLink className="w-3 h-3" strokeWidth={3} />
+            VIEW_CODEBASE{" "}
+            <ExternalLink
+              className="w-3 h-3 arrow-nudge"
+              strokeWidth={3}
+            />
           </a>
         </div>
       </div>
