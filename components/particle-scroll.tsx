@@ -495,6 +495,11 @@ export function createParticleScroll(
       );
       line += (h + band - line) * endP * endP;
     }
+    // Before the user scrolls, keep the formation line off-screen below the
+    // viewport so the initial paint looks like a normal page — no particles.
+    // The line climbs to its configured position as soon as scrolling starts.
+    const reveal = Math.min(scrollSmooth / h, 1);
+    line = h + (line - h) * reveal;
     const vy = docRowY - scrollSmooth;
     return Math.min(Math.max((line + band - vy) / band, 0), 1);
   }
