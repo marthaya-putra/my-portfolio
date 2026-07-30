@@ -12,7 +12,7 @@ export function Hero() {
   return (
     <header className="max-w-4xl mx-auto px-6 py-24">
       {/* Drawing title-block top edge: technical metadata strip */}
-      <div className="mono-label flex flex-wrap items-center gap-x-3 gap-y-1 text-primary/80 mb-8 pb-3 border-b border-dashed border-border">
+      <div className="mono-label flex flex-wrap items-center gap-x-3 gap-y-1 text-primary mb-8 pb-3 border-b border-dashed border-border">
         <span>DOC-001</span>
         <span className="text-border">/</span>
         <span className="text-muted-foreground">SOFTWARE ENGINEER</span>

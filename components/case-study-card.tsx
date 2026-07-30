@@ -41,7 +41,7 @@ export function CaseStudyCard({
       {/* Panel header: index + title + metadata strip + badge */}
       <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
         <div className="min-w-0">
-          <div className="mono-label text-primary/70 mb-2">
+          <div className="mono-label text-primary mb-2">
             {padIndex} <span className="text-border">/</span> CASE STUDY
           </div>
           <h3 className="text-2xl font-bold text-card-foreground tracking-tight">
@@ -56,14 +56,14 @@ export function CaseStudyCard({
       </div>
 
       {/* Metadata strip: company · dates */}
-      <div className="mono-label text-muted-foreground/80 pb-4 mb-6 border-b border-dashed border-border">
+      <div className="mono-label text-muted-foreground pb-4 mb-6 border-b border-dashed border-border">
         {subtitle}
       </div>
 
       {challenge && solution && (
         <div className="grid md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-2 mb-6">
           <div className="bg-background border border-border rounded-sm p-4">
-            <div className="mono-label text-muted-foreground/70 mb-2">
+            <div className="mono-label text-muted-foreground mb-2">
               ▸ Challenge
             </div>
             <p className="text-sm text-secondary-foreground italic leading-relaxed">
@@ -74,7 +74,7 @@ export function CaseStudyCard({
             <span className="font-mono text-primary text-xl">→</span>
           </div>
           <div className="bg-background border border-border rounded-sm p-4">
-            <div className="mono-label text-primary/80 mb-2">▸ Solution</div>
+            <div className="mono-label text-primary mb-2">▸ Solution</div>
             <p
               className="text-sm text-secondary-foreground leading-relaxed [&_strong]:text-foreground [&_strong]:font-semibold"
               dangerouslySetInnerHTML={{ __html: solution }}
@@ -85,7 +85,7 @@ export function CaseStudyCard({
 
       {tradeOffs && tradeOffs.length > 0 && (
         <div className="mb-6">
-          <div className="mono-label text-muted-foreground/80 mb-3">
+          <div className="mono-label text-muted-foreground mb-3">
             § Trade-off Ledger
           </div>
           <div className="space-y-2">
@@ -99,7 +99,7 @@ export function CaseStudyCard({
                 </div>
                 <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
                   <div className="px-3 py-2">
-                    <div className="mono-label text-accent/90 mb-1 text-[10px]">
+                    <div className="mono-label text-accent mb-1 text-[10px]">
                       ▲ Benefit
                     </div>
                     <p className="text-xs text-secondary-foreground">
@@ -107,7 +107,7 @@ export function CaseStudyCard({
                     </p>
                   </div>
                   <div className="px-3 py-2">
-                    <div className="mono-label text-muted-foreground/80 mb-1 text-[10px]">
+                    <div className="mono-label text-muted-foreground mb-1 text-[10px]">
                       ▼ Cost
                     </div>
                     <p className="text-xs text-muted-foreground">
@@ -134,7 +134,7 @@ export function CaseStudyCard({
                   key={point}
                   className="flex gap-2 text-sm text-muted-foreground"
                 >
-                  <span className="font-mono text-primary/70 shrink-0">—</span>
+                  <span className="font-mono text-primary shrink-0">—</span>
                   <span>{point}</span>
                 </li>
               ))}

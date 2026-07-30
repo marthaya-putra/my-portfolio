@@ -6,7 +6,7 @@ export function Footer() {
       <div className="border border-border rounded-sm overflow-hidden">
         <div className="grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 divide-x divide-border">
           <div className="p-3 border-b sm:border-b-0 border-border">
-            <div className="mono-label text-muted-foreground/60 text-[9px] mb-1">
+            <div className="mono-label text-muted-foreground text-[9px] mb-1">
               Sheet
             </div>
             <div className="mono-label text-foreground text-xs">
@@ -14,7 +14,7 @@ export function Footer() {
             </div>
           </div>
           <div className="p-3 border-b sm:border-b-0 border-border">
-            <div className="mono-label text-muted-foreground/60 text-[9px] mb-1">
+            <div className="mono-label text-muted-foreground text-[9px] mb-1">
               Drawn By
             </div>
             <div className="mono-label text-foreground text-xs">
@@ -22,13 +22,13 @@ export function Footer() {
             </div>
           </div>
           <div className="p-3 border-border">
-            <div className="mono-label text-muted-foreground/60 text-[9px] mb-1">
+            <div className="mono-label text-muted-foreground text-[9px] mb-1">
               Scale
             </div>
             <div className="mono-label text-foreground text-xs">1:1</div>
           </div>
           <div className="p-3 border-border">
-            <div className="mono-label text-muted-foreground/60 text-[9px] mb-1">
+            <div className="mono-label text-muted-foreground text-[9px] mb-1">
               Rev
             </div>
             <div className="mono-label text-foreground text-xs">

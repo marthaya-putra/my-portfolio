@@ -122,7 +122,7 @@ export function FittedInDiagram() {
       </div>
 
       <div className="p-5 md:p-7 bg-background blueprint-grid relative space-y-3">
-        <div className="mono-label text-muted-foreground/60 text-[10px]">
+        <div className="mono-label text-muted-foreground text-[10px]">
           Fig. 01 — Parallel Agent Synthesis
         </div>
 
@@ -161,7 +161,7 @@ export function FittedInDiagram() {
           </div>
           <div className="bg-card border border-border rounded-sm px-3 py-2 flex justify-between items-center shadow-sm">
             <div className="flex flex-col">
-              <span className="mono-label text-muted-foreground/70 text-[10px]">
+              <span className="mono-label text-muted-foreground text-[10px]">
                 Final Output
               </span>
               <span className="font-mono text-xs font-bold text-foreground">
@@ -193,7 +193,7 @@ export function MyFlixDiagram() {
       </div>
 
       <div className="p-5 md:p-7 bg-background blueprint-grid relative space-y-3">
-        <div className="mono-label text-muted-foreground/60 text-[10px]">
+        <div className="mono-label text-muted-foreground text-[10px]">
           Fig. 02 — Reciprocal Affinity Feedback Loop
         </div>
 
@@ -215,7 +215,7 @@ export function MyFlixDiagram() {
               <div className="mono-label text-[10px] text-primary border-b border-border pb-1">
                 Scoring Engine
               </div>
-              <p className="font-mono text-[9px] leading-tight italic text-muted-foreground">
+              <p className="font-mono text-[10px] leading-snug text-muted-foreground">
                 Weights IDs by sentiment frequency.
               </p>
             </div>
@@ -223,7 +223,7 @@ export function MyFlixDiagram() {
               <div className="mono-label text-[10px] text-primary border-b border-border pb-1">
                 Filter Pruning
               </div>
-              <p className="font-mono text-[9px] leading-tight italic text-muted-foreground">
+              <p className="font-mono text-[10px] leading-snug text-muted-foreground">
                 Excludes content matching negative IDs.
               </p>
             </div>
@@ -233,7 +233,7 @@ export function MyFlixDiagram() {
         {/* Loop-back indicator: the reciprocal loop */}
         <div className="flex items-center gap-2 justify-center">
           <span className="font-mono text-primary text-sm">⟲</span>
-          <span className="mono-label text-muted-foreground/70 text-[10px]">
+          <span className="mono-label text-muted-foreground text-[10px]">
             re-ranks & feeds back into discovery
           </span>
         </div>
