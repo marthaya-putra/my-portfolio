@@ -150,16 +150,16 @@ function HomePage() {
       <ParticleScroll className="flex-1 min-h-0">
         <Hero />
 
-        <main className="max-w-4xl mx-auto px-6 pb-24">
+        <main className="max-w-4xl mx-auto px-6 pb-24 blueprint-grid">
           <section id="case-studies" className="space-y-16">
-            <SectionHeader>Selected Impacts</SectionHeader>
-            {caseStudies.map((study) => (
-              <CaseStudyCard key={study.title} {...study} />
+            <SectionHeader index={1}>Selected Impacts</SectionHeader>
+            {caseStudies.map((study, index) => (
+              <CaseStudyCard key={study.title} index={index} {...study} />
             ))}
           </section>
 
           <section id="personal-projects" className="mt-24 space-y-16">
-            <SectionHeader>Personal Projects</SectionHeader>
+            <SectionHeader index={2}>Personal Projects</SectionHeader>
             {personalProjects.map((project) => (
               <PersonalProjectCard key={project.title} {...project} />
             ))}

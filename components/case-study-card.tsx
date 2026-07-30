@@ -1,22 +1,24 @@
 interface TradeOff {
-  decision: string
-  productBenefit: string
-  techTradeOff: string
+  decision: string;
+  productBenefit: string;
+  techTradeOff: string;
 }
 
 interface CaseStudyProps {
-  title: string
-  subtitle: string
-  badgeText: string
-  badgeVariant: "green" | "blue"
-  challenge?: string
-  solution?: string
-  tradeOffs?: TradeOff[]
-  description?: string
-  bulletPoints?: string[]
+  index: number;
+  title: string;
+  subtitle: string;
+  badgeText: string;
+  badgeVariant: "green" | "blue";
+  challenge?: string;
+  solution?: string;
+  tradeOffs?: TradeOff[];
+  description?: string;
+  bulletPoints?: string[];
 }
 
 export function CaseStudyCard({
+  index,
   title,
   subtitle,
   badgeText,
@@ -29,39 +31,52 @@ export function CaseStudyCard({
 }: CaseStudyProps) {
   const badgeClasses =
     badgeVariant === "green"
-      ? "bg-accent/10 text-accent"
-      : "bg-primary/10 text-primary"
+      ? "bg-accent/10 text-accent border-accent/30"
+      : "bg-primary/10 text-primary border-primary/30";
+
+  const padIndex = String(index + 1).padStart(2, "0");
 
   return (
-    <article className="bg-card border border-border rounded-2xl p-8 transition-[border-color,box-shadow] duration-200 ease-[var(--ease-out)] shadow-sm hover:border-primary hover:shadow-md">
-      <div className="flex flex-wrap justify-between items-start mb-6">
-        <div>
-          <h3 className="text-2xl font-bold mb-2 text-card-foreground">
+    <article className="tick card-hover bg-card border border-border rounded-sm p-8 shadow-sm hover:border-primary hover:shadow-md">
+      {/* Panel header: index + title + metadata strip + badge */}
+      <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+        <div className="min-w-0">
+          <div className="mono-label text-primary/70 mb-2">
+            {padIndex} <span className="text-border">/</span> CASE STUDY
+          </div>
+          <h3 className="text-2xl font-bold text-card-foreground tracking-tight">
             {title}
           </h3>
-          <p className="text-primary font-medium">{subtitle}</p>
         </div>
         <div
-          className={`${badgeClasses} px-4 py-2 rounded-lg text-sm font-bold mt-2 sm:mt-0`}
+          className={`mono-label shrink-0 px-3 py-1.5 rounded-sm border ${badgeClasses}`}
         >
           {badgeText}
         </div>
       </div>
 
+      {/* Metadata strip: company · dates */}
+      <div className="mono-label text-muted-foreground/80 pb-4 mb-6 border-b border-dashed border-border">
+        {subtitle}
+      </div>
+
       {challenge && solution && (
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <h4 className="font-semibold text-muted-foreground uppercase text-xs tracking-widest mb-2">
-              The Challenge
-            </h4>
-            <p className="text-secondary-foreground italic">{challenge}</p>
+        <div className="grid md:grid-cols-[1fr_auto_1fr] gap-4 md:gap-2 mb-6">
+          <div className="bg-background border border-border rounded-sm p-4">
+            <div className="mono-label text-muted-foreground/70 mb-2">
+              ▸ Challenge
+            </div>
+            <p className="text-sm text-secondary-foreground italic leading-relaxed">
+              {challenge}
+            </p>
           </div>
-          <div>
-            <h4 className="font-semibold text-muted-foreground uppercase text-xs tracking-widest mb-2">
-              The Solution
-            </h4>
+          <div className="hidden md:flex items-center justify-center">
+            <span className="font-mono text-primary text-xl">→</span>
+          </div>
+          <div className="bg-background border border-border rounded-sm p-4">
+            <div className="mono-label text-primary/80 mb-2">▸ Solution</div>
             <p
-              className="text-secondary-foreground"
+              className="text-sm text-secondary-foreground leading-relaxed [&_strong]:text-foreground [&_strong]:font-semibold"
               dangerouslySetInnerHTML={{ __html: solution }}
             />
           </div>
@@ -69,49 +84,64 @@ export function CaseStudyCard({
       )}
 
       {tradeOffs && tradeOffs.length > 0 && (
-        <div className="bg-background rounded-xl p-6 mb-8 border border-border">
-          <h4 className="font-semibold mb-4 text-sm text-foreground">
-            Technical Trade-off Matrix
-          </h4>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="text-muted-foreground border-b border-border">
-                  <th className="pb-2 font-medium">Decision</th>
-                  <th className="pb-2 font-medium">Product Benefit</th>
-                  <th className="pb-2 font-medium">Tech Trade-off</th>
-                </tr>
-              </thead>
-              <tbody className="text-secondary-foreground">
-                {tradeOffs.map((tradeOff, index) => (
-                  <tr
-                    key={tradeOff.decision}
-                    className={index > 0 ? "border-t border-border/50" : ""}
-                  >
-                    <td className="py-3 font-semibold">{tradeOff.decision}</td>
-                    <td className="py-3 italic">{tradeOff.productBenefit}</td>
-                    <td className="py-3">{tradeOff.techTradeOff}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="mb-6">
+          <div className="mono-label text-muted-foreground/80 mb-3">
+            § Trade-off Ledger
+          </div>
+          <div className="space-y-2">
+            {tradeOffs.map((tradeOff, i) => (
+              <div
+                key={tradeOff.decision}
+                className="bg-background border border-border rounded-sm overflow-hidden"
+              >
+                <div className="mono-label text-xs text-foreground bg-muted/40 px-3 py-1.5 border-b border-border">
+                  {String(i + 1).padStart(2, "0")} · {tradeOff.decision}
+                </div>
+                <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
+                  <div className="px-3 py-2">
+                    <div className="mono-label text-accent/90 mb-1 text-[10px]">
+                      ▲ Benefit
+                    </div>
+                    <p className="text-xs text-secondary-foreground">
+                      {tradeOff.productBenefit}
+                    </p>
+                  </div>
+                  <div className="px-3 py-2">
+                    <div className="mono-label text-muted-foreground/80 mb-1 text-[10px]">
+                      ▼ Cost
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {tradeOff.techTradeOff}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
       {description && (
-        <div className="space-y-4 text-secondary-foreground">
-          <p dangerouslySetInnerHTML={{ __html: description }} />
+        <div className="space-y-3 text-secondary-foreground border-t border-dashed border-border pt-4">
+          <p
+            className="text-sm leading-relaxed [&_strong]:text-foreground [&_strong]:font-semibold"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
           {bulletPoints && bulletPoints.length > 0 && (
-            <ul className="list-disc ml-5 space-y-2 opacity-80">
+            <ul className="space-y-1.5">
               {bulletPoints.map((point) => (
-                <li key={point}>{point}</li>
+                <li
+                  key={point}
+                  className="flex gap-2 text-sm text-muted-foreground"
+                >
+                  <span className="font-mono text-primary/70 shrink-0">—</span>
+                  <span>{point}</span>
+                </li>
               ))}
             </ul>
           )}
         </div>
       )}
-
     </article>
-  )
+  );
 }

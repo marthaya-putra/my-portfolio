@@ -110,3 +110,86 @@
     }
   }
 }
+
+@layer utilities {
+  /* Latent-defect fix: referenced in particle-scroll.tsx but never defined.
+     Hides the native scrollbar of the inner capture scroller. */
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Faint engineering graph-paper crosshatch. Rasterization-safe:
+     static background-image gradients only (same technique as the
+     existing dot-grid in the project diagrams). */
+  .blueprint-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--foreground) / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--foreground) / 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Drawing-panel corner registration marks — L-brackets at all four
+     corners via pseudo-elements. Pure border box-drawing, rasterizes. */
+  .tick {
+    position: relative;
+  }
+  .tick::before,
+  .tick::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    pointer-events: none;
+  }
+  .tick::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid hsl(var(--primary) / 0.6);
+    border-left: 2px solid hsl(var(--primary) / 0.6);
+  }
+  .tick::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid hsl(var(--primary) / 0.6);
+    border-right: 2px solid hsl(var(--primary) / 0.6);
+  }
+
+  /* Mono technical-label strip: JetBrains Mono, uppercase, tracked. */
+  .mono-label {
+    font-family: "JetBrains Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+  }
+
+  /* Card hover: border-color + box-shadow only, named transition
+     (avoids transition: all). Replaces arbitrary ease-[var(--ease-out)]
+     syntax that Tailwind warns is ambiguous. */
+  .card-hover {
+    transition:
+      border-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
+  }
+
+  /* External-link arrow diagonal nudge on group-hover — spatial
+     feedback for an out-bound link. */
+  .arrow-nudge {
+    transition: transform 200ms var(--ease-out);
+  }
+  .group:hover .arrow-nudge {
+    transform: translate(2px, -2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .arrow-nudge {
+      transition-duration: 100ms;
+    }
+    .group:hover .arrow-nudge {
+      transform: translate(1px, -1px);
+    }
+  }
+}

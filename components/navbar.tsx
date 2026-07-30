@@ -4,9 +4,9 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border py-4">
       <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
-        <span className="font-bold tracking-tight text-xl text-foreground">
+        <span className="mono-label tracking-tight text-base text-foreground">
           {"MARTHAYA PUTRA"}
-          <span className="text-primary">.</span>
+          <span className="text-primary">_</span>
         </span>
         <div className="flex items-center gap-6 text-sm font-medium text-muted-foreground">
           <a
