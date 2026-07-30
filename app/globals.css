@@ -43,6 +43,7 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   }
   .dark {
     --background: 215 25% 8%;
@@ -77,6 +78,7 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   }
 }
 
@@ -86,5 +88,25 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .pressable {
+    transition:
+      color 150ms var(--ease-out),
+      background-color 150ms var(--ease-out),
+      transform 150ms var(--ease-out);
+  }
+  .pressable:active {
+    transform: scale(0.97);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pressable {
+      transition-duration: 100ms;
+    }
+    .pressable:active {
+      transform: scale(0.99);
+    }
   }
 }

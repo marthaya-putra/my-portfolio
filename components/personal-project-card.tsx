@@ -309,7 +309,7 @@ export function PersonalProjectCard({
             href={githubUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-xs font-bold text-primary flex items-center gap-2 hover:underline"
+            className="pressable font-mono text-xs font-bold text-primary flex items-center gap-2 hover:underline"
           >
             VIEW_CODEBASE <ExternalLink className="w-3 h-3" strokeWidth={3} />
           </a>
