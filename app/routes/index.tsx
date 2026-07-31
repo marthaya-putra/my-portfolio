@@ -1,8 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  ParticleScroll,
-  supportsHtmlInCanvas,
-} from "@/components/particle-scroll";
+import { ParticleScroll } from "@/components/particle-scroll";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
 import { CaseStudyCard } from "@/components/case-study-card";
@@ -14,7 +11,6 @@ import {
 } from "@/components/personal-project-card";
 import { Philosophy } from "@/components/philosophy";
 import { Footer } from "@/components/footer";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -139,15 +135,10 @@ const personalProjects = [
 
 function HomePage() {
   return (
-    <div
-      className={cn(
-        "bg-background text-foreground leading-relaxed h-[100dvh] flex flex-col",
-        supportsHtmlInCanvas() && "overflow-hidden",
-      )}
-    >
+    <div className="bg-background text-foreground leading-relaxed">
       <Navbar />
 
-      <ParticleScroll className="flex-1 min-h-0">
+      <ParticleScroll>
         <Hero />
 
         <main className="max-w-4xl mx-auto px-6 pb-24 blueprint-grid">
